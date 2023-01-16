@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-//declare var $: any    //Jquery Testi
+
 
 
 
@@ -10,9 +10,7 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'EcommerceClient';
+  
+
 }
-/* Jquery Testi
-$(document).ready(()=>{
-  alert("ads")
-})
-*/
+
