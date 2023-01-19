@@ -24,7 +24,7 @@ export class HttpClientService {
       url = requestParameters.fullEndPoint;
     else
       url = `${this.url(requestParameters)}${id ? `/${id}` : ""}`;
-    return this.httpClient.get<T>(url, { headers: requestParameters.headers })
+    return this.httpClient.get<T>(url, { headers: requestParameters.headers })    //requestParameters'de varsa bir headers, ekle.
   }
 
   post<T>(requestParameters: Partial<RequestParameters>, body: Partial<T>): Observable<T> {
