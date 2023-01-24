@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { BaseComponent, SpinnerType } from 'src/app/base/base.component';
 import { Create_Product } from 'src/app/contracts/create_product';
@@ -14,6 +14,9 @@ export class CreateComponent extends BaseComponent {
   constructor(spiner: NgxSpinnerService, private productService: ProductService, private alertify: AlertifyService) {
     super(spiner);
   }
+
+  @Output() createdProduct: EventEmitter<Create_Product> = new EventEmitter();
+
   create(name: HTMLInputElement, stock: HTMLInputElement, price: HTMLInputElement) {
     this.showSpinner(SpinnerType.Pacman);
 
@@ -28,12 +31,13 @@ export class CreateComponent extends BaseComponent {
         dismissOthers: true,
         messageType: MessageType.Success,
         position: Position.BottomCenter
-      })
-    },errorMessage =>  {
-      this.alertify.message(errorMessage, 
+      });
+      this.createdProduct.emit(create_product);
+    }, errorMessage => {
+      this.alertify.message(errorMessage,
         {
-          dismissOthers:true,
-          messageType:MessageType.Error,
+          dismissOthers: true,
+          messageType: MessageType.Error,
           position: Position.BottomCenter
         })
     });
