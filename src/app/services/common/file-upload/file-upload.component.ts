@@ -1,8 +1,11 @@
 import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Component, Input } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { NgxFileDropEntry } from 'ngx-file-drop';
+import { FileUploadDialogComponent, FileUploadDialogState } from 'src/app/dialogs/file-upload-dialog/file-upload-dialog.component';
 import { AlertifyService, MessageType, Position } from '../../admin/alertify.service';
 import { CustomToastrService, ToastrMessageType, ToastrPosition } from '../../ui/custom-toastr.service';
+import { DialogService } from '../dialog.service';
 import { HttpClientService } from '../http-client.service';
 
 @Component({
@@ -14,7 +17,9 @@ export class FileUploadComponent {
   constructor(
     private httpClientService: HttpClientService,
     private alertifyService: AlertifyService,
-    private customToastrService: CustomToastrService
+    private customToastrService: CustomToastrService,
+    private dialog: MatDialog,
+    private dialogService: DialogService
   ) { }
 
   public files: NgxFileDropEntry[];
@@ -32,45 +37,53 @@ export class FileUploadComponent {
         //Seçilen tüm dosyaları fileData ya koyuldu.
       })
     }
-    this.httpClientService.post({
-      controller: this.options.controller,
-      action: this.options.action,
-      queryString: this.options.queryString,
-      headers: new HttpHeaders({ "responseType": "blob" })
-    }, fileData).subscribe(data => {
+    this.dialogService.openDialog({
+      componentType: FileUploadDialogComponent,
+      data: FileUploadDialogState.Yes,
+      afterClosed: () => {
+        this.httpClientService.post({
+          controller: this.options.controller,
+          action: this.options.action,
+          queryString: this.options.queryString,
+          headers: new HttpHeaders({ "responseType": "blob" })
+        }, fileData).subscribe(data => {
 
-      const message: string = "Dosyalar Başarıyla yüklenmiştir.";
-      if (this.options.isAdminPage) {
-        this.alertifyService.message(message, {
-          dismissOthers: true,
-          messageType: MessageType.Success,
-          position: Position.TopCenter
-        })
-      } else {
-        this.customToastrService.message(message, "Başarılı", {
-          messageType: ToastrMessageType.Success,
-          position: ToastrPosition.TopCenter
+          const message: string = "Dosyalar Başarıyla yüklenmiştir.";
+          if (this.options.isAdminPage) {
+            this.alertifyService.message(message, {
+              dismissOthers: true,
+              messageType: MessageType.Success,
+              position: Position.TopCenter
+            })
+          } else {
+            this.customToastrService.message(message, "Başarılı", {
+              messageType: ToastrMessageType.Success,
+              position: ToastrPosition.TopCenter
+            })
+          }
+
+        }, (errorResponse: HttpErrorResponse) => {
+
+          const message: string = "Dosyalar yüklenirken beklenmeyen bir hata ile karşılaşıldı.";
+          if (this.options.isAdminPage) {
+            this.alertifyService.message(message, {
+              dismissOthers: true,
+              messageType: MessageType.Error,
+              position: Position.TopCenter
+            })
+          } else {
+            this.customToastrService.message(message, "Başarısız.", {
+              messageType: ToastrMessageType.Error,
+              position: ToastrPosition.TopCenter
+            })
+          }
+
         })
       }
-
-    }, (errorResponse: HttpErrorResponse) => {
-
-      const message: string = "Dosyalar yüklenirken beklenmeyen bir hata ile karşılaşıldı.";
-      if (this.options.isAdminPage) {
-        this.alertifyService.message(message, {
-          dismissOthers: true,
-          messageType: MessageType.Error,
-          position: Position.TopCenter
-        })
-      } else {
-        this.customToastrService.message(message, "Başarısız.", {
-          messageType: ToastrMessageType.Error,
-          position: ToastrPosition.TopCenter
-        })
-      }
-
     })
+
   }
+
 }
 
 export class FileUploadOptions {
