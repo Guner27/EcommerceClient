@@ -1,0 +1,15 @@
+.product-image-card {
+    max-width: 210px;
+    float: left;
+    margin: 3px;
+  }
+  
+  .product-header-image {
+    background-image: url('https://material.angular.io/assets/img/examples/shiba1.jpg');
+    background-size: cover;
+  }
+
+  .delete-button{
+    background-color: crimson;
+    color: aliceblue;
+  }
