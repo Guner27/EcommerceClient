@@ -1,3 +1,4 @@
+import { SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -16,9 +17,19 @@ export class LoginComponent extends BaseComponent {
     spinner: NgxSpinnerService,
     private authService: AuthService,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private socialAuthService: SocialAuthService
   ) {
     super(spinner);
+    socialAuthService.authState.subscribe(async (user: SocialUser) => {
+      console.log(user);
+      this.showSpinner(SpinnerType.BallScaleMultiple)
+      await userService.googleLogin(user, () => {
+        //Eğer giriş başarılıysa AuthService deki IdentityCheck'i tekrar tetikle(ki yönetim panali görünsün) ve spinneri kapat
+        authService.identityChack()
+        this.hideSpinner(SpinnerType.BallScaleMultiple)
+      })
+    })
   }
 
   async login(usernameOrEmail: string, password: string) {
